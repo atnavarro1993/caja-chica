@@ -2,9 +2,9 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+#[tauri::command(rename_all = "snake_case")]
+fn greet(name: &str,last_name: &str,age: &str) -> String {
+    format!("tu nombre es {}, y tu apellido {}. Tenes {} años", name,last_name,age)
 }
 
 fn main() {
