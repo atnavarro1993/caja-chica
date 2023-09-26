@@ -3,17 +3,23 @@ import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 import { Button, FormControl, TextField } from "@mui/material";
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [{name,lastName,age}, setForm] = useState({
-    name: "",
-    lastName: "",
-    age: ""
-  })
 
+function App() {
+  //const [greetMsg, setGreetMsg] = useState("");
+
+  const [{ammount,desc,date}, setForm] = useState({
+    ammount: "",
+    desc: "",
+    date: ""
+  })
+ 
   const showMessage = async () => {
-    console.log();
-    setGreetMsg(await invoke("greet", {name:name,last_name:lastName,age:age}));
+    try {
+      let test=  await invoke("add_record", {ammount:Number(ammount),desc:desc,date:date})
+      console.log(test);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
 
@@ -24,16 +30,16 @@ function App() {
     }))
   }
 
-
+ 
   return (
     <div className="container">
       <FormControl>
-        <TextField onChange={handleForm} value={name} name="name"></TextField>
-        <TextField onChange={handleForm} value={lastName} name="lastName"></TextField>
-        <TextField onChange={handleForm} value={age} name="age"></TextField>
-        <Button variant="contained" onClick={showMessage}>Greet</Button>
+        <TextField onChange={handleForm} value={ammount} name="ammount"></TextField>
+        <TextField onChange={handleForm} value={desc} name="desc"></TextField>
+        <TextField onChange={handleForm} value={date} name="date"></TextField>
+        <Button onClick={showMessage} variant="contained">Greet</Button>
       </FormControl>
-      <p>{greetMsg}</p>
+
     </div>
   );
 }
