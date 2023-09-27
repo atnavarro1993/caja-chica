@@ -10,7 +10,6 @@ fn greet(name: &str,last_name: &str,age: &str) -> String {
 }
 
 fn main() {
-    println!("inicio");
     let _ = {
        let _conn = Connection::open("./assets/caja.db");
         db_utils::db::init_db(&_conn.unwrap());
