@@ -1,56 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
-import "./App.css";
-import { Button, FormControl, TextField } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import {es} from 'date-fns/locale';
+import { Button, FormControl, TextField, Grid } from "@mui/material";
+import { useForm} from 'react-hook-form';
+import { DataGrid } from '@mui/x-data-grid'
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-
-  const [{ammount,desc,date}, setForm] = useState({
-    ammount: 0,
-    desc: "",
-    date: undefined
-  })
- 
-  const sendFinancialEvent = async () => {
-    try {
-      let res=  await invoke("add_record", {ammount:Number(ammount),desc:desc,date:date})
-      setGreetMsg(res);
-    } catch (error) {
-      setGreetMsg(error); 
+  const [message, setMessage] = useState('');
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    formState: {errors}
+  } = useForm();
+  const onSubmit = async (data) => {
+    try{
+      let res = await invoke("add_record", {
+        ammount:Number(data.ammount),
+        desc:data.desc,
+        date:data.date
+      });
+      console.log(res);
+      getAllFinancialEvents();
+      setMessage(res)
+    }catch(error){
+      setMessage(error)
     }
-  } 
+  }; 
    
-
  
-  const handleForm = (e) => {
-    setForm((pre)=> ({
-      ...pre,
-      [e.target.name]: e.target.value
-    }))
-  }
+  const getAllFinancialEvents = async () => {
+    try { 
+      let res=  await invoke("get_all_records")
+      console.log(res);
+    } catch (error) {
+      console.log(error); 
+    }
+  }  
  
-  const handleDate = () =>{
-
-  }
+  useEffect(()=>{
+    getAllFinancialEvents();
+  },[])
+  
   
   return (
-    <div className="container">
-      <FormControl>
-        <TextField onChange={handleForm} value={ammount} name="ammount"></TextField>
-        <TextField onChange={handleForm} value={desc} name="desc"></TextField>
-        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
-          <DatePicker onChange={handleDate} value={date}></DatePicker> 
-        </LocalizationProvider>
-        <Button onClick={sendFinancialEvent} variant="contained">Greet</Button>
-      </FormControl>
-      <p>{greetMsg}</p>
-      <p>{date}</p>
+    <div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Grid container spacing={2} alignItems={"center"}>
+          <Grid item>
+            <TextField {...register("ammount")} label="$" name="ammount"/>
+          </Grid>
+          <Grid item>  
+            <TextField {...register("desc")} label="descripcion" name="desc"/>
+          </Grid>
+          <Grid item>
+            <TextField {...register("date")} name="date" type="date"/>
+          </Grid>
+          <Grid item>
+            <Button type="submit" variant="contained">ingresar</Button>
+          </Grid>
+        </Grid>
+      </form>
+      <p>{message}</p>
     </div>
-  ); 
-} 
+  );   
+}  
 
 export default App;
