@@ -4,10 +4,13 @@
 
 mod services;
 mod db_utils;
+mod common;
 
-use rusqlite::Connection;
 
-use services::db;
+
+use common::common::open_db;
+
+use services::{db, event_types};
 use std::fs;
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command(rename_all = "snake_case")]
@@ -21,13 +24,15 @@ fn main() {
         Err(_) => (),
     }
     let _ = {
-        let _conn = Connection::open("./assets/caja.db");
+        let _conn = open_db();
         db_utils::init_db(&_conn.unwrap());
     };
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             greet,
-            db::add_record,db::get_all_records])
+            db::add_record,
+            db::get_all_records,
+            event_types::get_all_event_types])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 

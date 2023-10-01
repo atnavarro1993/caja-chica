@@ -3,13 +3,15 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { Button, FormControl, TextField, Grid } from "@mui/material";
 import { useForm} from 'react-hook-form';
 import { DataGrid } from '@mui/x-data-grid'
+import { GrillaEventos } from "./components/GrillaEventos";
+import { EventChart } from "./components/EventChart";
 function App() {
   const [message, setMessage] = useState('');
+  const [eventRows, setEventRows] = useState([]);
+  const [eventTypes, setEventTypes] = useState([]);
   const {
     register,
     handleSubmit,
-    control,
-    watch,
     formState: {errors}
   } = useForm();
   const onSubmit = async (data) => {
@@ -31,12 +33,20 @@ function App() {
   const getAllFinancialEvents = async () => {
     try { 
       let res=  await invoke("get_all_records")
-      console.log(res);
+      setEventRows(res);
     } catch (error) {
       console.log(error); 
     }
   }  
  
+  const getEventTypes = async () => {
+    try{
+
+    }catch (e){
+      
+    }
+  }
+
   useEffect(()=>{
     getAllFinancialEvents();
   },[])
@@ -61,8 +71,10 @@ function App() {
         </Grid>
       </form>
       <p>{message}</p>
+      <GrillaEventos rows={eventRows}/>
+      <EventChart rows={eventRows}/>
     </div>
-  );   
-}  
+  );
+}   
 
 export default App;

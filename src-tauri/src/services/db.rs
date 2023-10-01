@@ -1,42 +1,27 @@
-use rusqlite::{Connection, named_params, Error as RusqliteError};
+use rusqlite::{Connection, named_params};
 use serde::Serialize;
+use crate::common::common::{Error, open_db};
 #[derive(Debug, Serialize)]
 pub struct FinancialEvent {
     id: u64,
-    ammount: f64,
+    amount: f64,
     date: String,
     desc: String
 }
 
 
-#[derive(Debug, thiserror::Error)]
-pub enum Error{
-    #[error(transparent)]
-    Rusqlite(#[from] RusqliteError),
-    #[error(transparent)]
-    Io(#[from] std::io::Error)
-}
-
-impl serde::Serialize for Error {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: serde::Serializer {
-        serializer.serialize_str(self.to_string().as_ref())
-    }
-}
-
-#[tauri::command(rename_all = "snake_case")]
-    pub fn add_record(ammount: f64,desc: &str,date: &str) -> Result<String,String>{
-        print!("{}",&ammount);
+#[tauri::command]
+    pub fn add_record(ammount: f64,desc: &str,date: &str, event_type: u64) -> Result<String,String>{
         let conn = Connection::open("./assets/caja.db");
         let res = {
             let _conn = conn.unwrap();
             _conn.execute(
-                "insert into financial_events (ammount,date,desc) values (:ammount,:date,:desc);",
+                "insert into financial_events (amount,date,desc,event_type_id) values (:ammount,:date,:desc,:event_type);",
                 named_params! {
                 ":ammount": ammount,
                 ":date": date,
                 ":desc": desc,
+                ":event_type": event_type
             })
         };
         match res {
@@ -48,18 +33,20 @@ impl serde::Serialize for Error {
 #[tauri::command(rename_all = "snake_case")]
 pub fn get_all_records()-> Result<Vec<FinancialEvent>,Error>{
 
-    let conn = Connection::open("./assets/caja.db").map_err(Error::Rusqlite)?;
+    let conn = open_db()?;
 
-    let mut stmt = conn.prepare("select * from financial_events").map_err(Error::Rusqlite)?;
+    let mut stmt = conn
+    .prepare("select * from financial_events order by date")
+    .map_err(Error::Rusqlite)?;
 
     let rows = stmt.query_map([], |row|{
         Ok(FinancialEvent{ 
             id: row.get(0)?, 
-            ammount: row.get(1)?, 
+            amount: row.get(1)?, 
             date: row.get(2)?, 
             desc: row.get(3)? })
     }).map_err(Error::Rusqlite)?;
     
-    let res: Result<Vec<_>, _> = rows.collect();
+    let res: Result<Vec<FinancialEvent>, _> = rows.collect();
     res.map_err(Error::Rusqlite)
 }
