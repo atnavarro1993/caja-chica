@@ -1,4 +1,3 @@
-use rusqlite::{Connection, named_params};
 use serde::Serialize;
 use crate::common::common::{Error, open_db}; 
 

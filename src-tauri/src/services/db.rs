@@ -6,7 +6,8 @@ pub struct FinancialEvent {
     id: u64,
     amount: f64,
     date: String,
-    desc: String
+    desc: String,
+    event_type_id: u64
 }
 
 
@@ -44,7 +45,9 @@ pub fn get_all_records()-> Result<Vec<FinancialEvent>,Error>{
             id: row.get(0)?, 
             amount: row.get(1)?, 
             date: row.get(2)?, 
-            desc: row.get(3)? })
+            desc: row.get(3)?,
+            event_type_id:row.get(4)? 
+        })
     }).map_err(Error::Rusqlite)?;
     
     let res: Result<Vec<FinancialEvent>, _> = rows.collect();

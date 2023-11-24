@@ -1,70 +1,56 @@
-import {CategoryScale, Chart as ChartJS, 
+import {ArcElement, Chart as ChartJS, 
     Legend, 
-    LineElement, 
-    LinearScale, 
-    PointElement, 
     Title, 
     Tooltip} from 'chart.js';
-import {Line} from 'react-chartjs-2';
+import {Pie} from 'react-chartjs-2';
 
 ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
+    ArcElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
 )
 
 
 
 export const EventChart = ({rows}) =>{
-
     if(rows.length === 0){
         return <></>
     }
-    const labels = rows.map(x=>x.date);
-    const options = {
-        responsive: true,
-        plugins:{
-            legend: {
-                position: 'top',
-            },
-            title: {
-                display: true,
-                text: 'eventos financieros'
-            }
-        },
-        tooltips: {
-            callbacks: {
-              label: function (tooltipItem) {
-                const datasetLabel = tooltipItem.dataset.label || '';
-                const desc = rows[tooltipItem.dataIndex].desc;
-                return `${datasetLabel}: ${tooltipItem.yLabel} - ${desc}`;
-              },
-            },
-          },
-    };
+    const datos = new Map();
+    rows.forEach(x => {
+        if(!datos.get(x.event_type_id)){
+            datos.set(x.event_type_id,x.amount)
+        }else{
+            datos.set(x.event_type_id, datos.get(x.event_type_id) + x.amount)
+        }
+    });
+    
+    datos.forEach(x => {
+        console.log(x)
+    })
 
+    const datosArray = Array.from(datos,([key,value])=> (value));
+    console.log(datosArray);
     const data = {
-
-        labels,
+        labels: ["ingresos","egresos"],
         datasets:[
             {
-                label: 'Dataset 1',
-                data: rows.map((rows) => rows.ammount),
-                borderColor: 'rgb(255, 99, 132)',
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                data: Array.from(datos,([key,value])=> (value)),
+                borderColor: 'rgb(0, 0, 0)',
+                backgroundColor: ['rgba(3, 71, 1, 1)','rgba(156, 148, 5, 1)'],
             }
         ]
     };
     
+    const options = {
+        maintainAspectRatio: true,
+        }
 
     return (
-        <>
-        <Line options={options} data={data} />
-        </>
+        <div>
+            <Pie data={data} options={options}/>
+        </div>
     ) 
 }
 
