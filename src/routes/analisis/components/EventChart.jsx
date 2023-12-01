@@ -11,8 +11,6 @@ ChartJS.register(
     Legend,
 )
 
-
-
 export const EventChart = ({rows}) =>{
     if(rows.length === 0){
         return <></>
@@ -25,13 +23,8 @@ export const EventChart = ({rows}) =>{
             datos.set(x.event_type_id, datos.get(x.event_type_id) + x.amount)
         }
     });
-    
-    datos.forEach(x => {
-        console.log(x)
-    })
 
-    const datosArray = Array.from(datos,([key,value])=> (value));
-    console.log(datosArray);
+
     const data = {
         labels: ["ingresos","egresos"],
         datasets:[
@@ -45,12 +38,14 @@ export const EventChart = ({rows}) =>{
     
     const options = {
         maintainAspectRatio: true,
+        responsive: true
         }
 
     return (
-        <div>
-            <Pie data={data} options={options}/>
+        <div style={{padding:'20px',width:'400px'}}>
+            <Pie  data={data} options={options}/>
         </div>
+
     ) 
 }
 

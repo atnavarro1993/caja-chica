@@ -2,7 +2,7 @@ import { Box } from "@mui/material"
 import { DataGrid } from "@mui/x-data-grid"
 
 
-
+//TODO: paginar grilla
 export const GrillaEventos = ({rows,tipos}) => {
     rows.forEach(x =>{
         x.tipo = tipos.find(y => y.id ==x.event_type_id).event_type
@@ -17,13 +17,13 @@ export const GrillaEventos = ({rows,tipos}) => {
         {field: 'tipo',headerName:'tipo', flex:1},
         {field: 'date',headerName:'Date', flex:1}
     ]
-  
+
     return(
         <Box sx={{width:'60%',maxWidth:'40%'}}>
             <DataGrid rows={rows} columns={columns} disableRowSelectionOnClick initialState={{
             pagination: {
               paginationModel: {
-                pageSize: 7,
+                pageSize: 5,
               },
             },
           }}

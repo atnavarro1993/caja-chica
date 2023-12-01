@@ -1,102 +1,41 @@
-import { useState, useEffect } from "react";
-import { invoke } from "@tauri-apps/api/tauri";
-import { Button, TextField, Grid, InputLabel, Select, MenuItem, FormControl } from "@mui/material";
-import { Controller, useForm} from 'react-hook-form';
-import { GrillaEventos } from "./components/GrillaEventos";
-import { EventChart } from "./components/EventChart";
+import Analsis from "./routes/analisis/Analsis.jsx";
+import {TabContext, TabList, TabPanel} from "@mui/lab";
+import {Box, Tab} from "@mui/material";
+import {useState} from "react";
+import EventForm from "./routes/analisis/components/EventForm.jsx";
 
-
-//TODO: agregar toas de mensaje exitoso o error
 
 function App() {
-  const [message, setMessage] = useState('');
-  const [eventRows, setEventRows] = useState([]);
-  const [eventTypes, setEventTypes] = useState([]);
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: {errors}
-  } = useForm();
-  const onSubmit = async (data) => {
-    try{
-      console.log(data);
-      let res = await invoke("add_record", {
-        ammount:Number(data.ammount.replace(/,/g, '.')),
-        desc:data.desc,
-        date:data.date,
-        eventType: data.event_type
-      });
-      console.log(res);
-      getAllFinancialEvents();
-      setMessage(res)
-    }catch(error){
-      setMessage(error)
-      console.log(error)
-    }
-  }; 
-   
- 
-  const getAllFinancialEvents = async () => {
-    try { 
-      let res=  await invoke("get_all_records")
-      setEventRows(res);
-    } catch (e) {
-      console.error(e); 
-    }
-  }
- 
-  const getEventTypes = async () => {
-    try{
-      let res = await invoke("get_all_event_types");
-      setEventTypes(res);
-      console.log(res);
-    }catch (e){
-      console.error(e)
-    }
-  } 
 
-  useEffect(()=>{
-    getAllFinancialEvents();
-    getEventTypes();
-  },[])
+    const [value, setValue] = useState('1');
 
-  return (
-    <div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid container spacing={2} alignItems={"center"}>
-          <Grid item>
-            <TextField {...register("ammount")} label="$" name="ammount"/>
-          </Grid>
-          <Grid item>  
-            <TextField {...register("desc")} label="descripcion" name="desc"/>
-          </Grid>
-          <Grid item>
-            <TextField {...register("date")} name="date" type="date"/>
-          </Grid>
-          <Grid item>
-            <FormControl>
-              <InputLabel id="evnType-label">tipo</InputLabel>
-              <Controller name="event_type" control={control} defaultValue="" 
-                render={({field}) => (
-                <Select {...field} style={{minWidth: '100px'}} label="tipo"> 
-                {eventTypes.map((x) => {
-                  return <MenuItem key={x.id} value={x.id}>{x.event_type}</MenuItem>
-                })}
-                </Select>  
-            )}
-            />
-            </FormControl>
-          </Grid>
-          <Grid item>
-            <Button type="submit" variant="contained">ingresar</Button>
-          </Grid> 
-        </Grid>
-      </form>
-      <GrillaEventos rows={eventRows} tipos={eventTypes}/>
-      <EventChart rows={eventRows}/>
-    </div>
-  );
-}   
+    const handleChange = (event, newValue) => {
+        setValue(newValue)
+    }
+    return (
+        <div>
+
+            <Box sx={{width: '100%', typography: 'body1'}}>
+                <TabContext value={value}>
+                    <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
+                        <TabList onChange={handleChange} aria-label="lab API tabs example">
+                            <Tab label="Ingreso / Egreso" value="1"/>
+                            <Tab label="analisis mensual" value="2"/>
+                            <Tab label="analisis anual" value="3"/>
+                            <Tab label="analisis total" value="4"/>
+                        </TabList>
+                    </Box>
+                    <TabPanel value="1">
+                        <EventForm />
+                    </TabPanel>
+                    <TabPanel value="2"><Analsis scope={'mensual'}/></TabPanel>
+                    <TabPanel value="3"><Analsis scope={'anual'}/></TabPanel>
+                    <TabPanel value="4"><Analsis scope={'allTime'}/></TabPanel>
+                </TabContext>
+            </Box>
+        </div>
+
+    )
+}
 
 export default App;
