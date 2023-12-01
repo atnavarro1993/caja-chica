@@ -1,69 +1,44 @@
-import {Alert, Button, FormControl, Grid, InputLabel, MenuItem, Select, Snackbar, TextField} from "@mui/material";
+import {Button, FormControl, Grid, InputLabel, MenuItem, Select,TextField} from "@mui/material";
 import {Controller, useForm} from "react-hook-form";
-import {invoke} from "@tauri-apps/api/tauri";
 import {useEffect, useState} from "react";
+import {getEventTypes, onSubmit} from "../services/AnalisisServices.js";
+import CustomToastMessage from "../../../common/ToastMessage.jsx";
 
 
 export default function EventForm(){
 
     const [message, setMessage] = useState('');
     const [eventTypes, setEventTypes] = useState([]);
-    const [open ,setOpen] = useState(false);
     const [error, setError] = useState(false);
+    const [open, setOpen] = useState(false);
     const {
         register,
         handleSubmit,
         control,
         formState: {errors}
     } = useForm();
-    const onSubmit = async (data) => {
-        try{
-            await invoke("add_record", {
-                ammount:Number(data.ammount.replace(/,/g, '.')),
-                desc:data.desc,
-                date:data.date,
-                eventType: data.event_type
-            }).then((r) =>{
-                setMessage(r)
-                setError(false);
-                handleToastOpen()
-            });
-        }catch(error){
-            setMessage(error)
-            setError(true);
-            handleToastOpen()
-        }
-    };
-    const handleToastOpen = () => {
-        setOpen(true);
-    }
-    const handleToastClose = (event,reason) => {
-        if (reason === 'clickaway') return;
-
-        setOpen(false);
-
-    }
 
     useEffect(() => {
-        getEventTypes();
+        getEventTypes().then((r)=>{setEventTypes(r)});
     }, []);
-    const getEventTypes = async () => {
-        try{
-            let res = await invoke("get_all_event_types");
-            setEventTypes(res);
-        }catch (e){
-            console.error(e)
-        }
-    }
 
+    const handleOnSubmit = async (data) =>{
+        await onSubmit(data)
+            .then((r)=>{
+                setMessage(r);
+                setOpen(true);
+            })
+            .catch((e)=>{
+                setMessage(e);
+                setOpen(true);
+                setError(true);
+            });
+    }
+    //TODO: el custom toast se esta manejando mal internamente deberia haber una forma de retornarel toast? usando useState?
     return(
         <>
-            <Snackbar open={open} autoHideDuration={6000} onClose={handleToastClose}>
-                <Alert onClose={handleToastClose} severity={error ? 'warning' : 'success'} sx={{width: '100%'}}>
-                    {message}
-                </Alert>
-            </Snackbar>
-            <form onSubmit={handleSubmit(onSubmit)} style={{marginLeft: 'auto', marginRight: 'auto'}}>
+            <CustomToastMessage error={error} message={message} open={open}/>
+            <form onSubmit={handleSubmit(handleOnSubmit)} style={{marginLeft: 'auto', marginRight: 'auto'}}>
                 <Grid container spacing={2} alignItems={"center"}>
                     <Grid item>
                         <TextField {...register("ammount")} label="$" name="ammount"/>

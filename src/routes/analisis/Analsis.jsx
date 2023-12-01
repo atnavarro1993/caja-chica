@@ -4,31 +4,15 @@ import {Box} from "@mui/material";
 import {GrillaEventos} from "./components/GrillaEventos.jsx";
 import {EventChart} from "./components/EventChart.jsx";
 import {boxFlexCenterColumn, boxFlexCenterRow} from "../../assets/styles/styles.js"
+import {getAllFinancialEvents, getEventTypes} from "./services/AnalisisServices.js";
 
 export default function Analsis({scope}){
     const [eventRows, setEventRows] = useState([]);
     const [eventTypes, setEventTypes] = useState([]);
-    const getAllFinancialEvents = async () => {
-        try {
-            let res=  await invoke("get_all_records")
-            setEventRows(res);
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    const getEventTypes = async () => {
-        try{
-            let res = await invoke("get_all_event_types");
-            setEventTypes(res);
-        }catch (e){
-            console.error(e)
-        }
-    }
 
     useEffect(()=>{
-        getAllFinancialEvents();
-        getEventTypes();
+        getAllFinancialEvents().then((r) => {setEventRows(r)});
+        getEventTypes().then((r) => {setEventTypes(r)});
     },[])
 
 
