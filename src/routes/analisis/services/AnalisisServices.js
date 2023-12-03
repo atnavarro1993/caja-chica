@@ -4,7 +4,7 @@ export const getEventTypes = async () => {
     try{
         return await invoke("get_all_event_types");
     }catch (e){
-        console.error(e)
+        return e;
     }
 }
 
@@ -12,9 +12,22 @@ export const getAllFinancialEvents = async () => {
     try {
         return await invoke("get_all_records")
     } catch (e) {
-        console.error(e);
+        return e;
     }
 }
+
+
+export const getFinancialEventsByDate = async (month,year) => {
+    try{
+        return await invoke("get_records_by_date",{
+            month,
+            year
+        });
+    }catch(e){
+        return e;
+    }
+}
+
 
 export const onSubmit = async (data) => {
     try{

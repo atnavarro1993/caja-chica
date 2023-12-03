@@ -4,16 +4,46 @@ import {Box} from "@mui/material";
 import {GrillaEventos} from "./components/GrillaEventos.jsx";
 import {EventChart} from "./components/EventChart.jsx";
 import {boxFlexCenterColumn, boxFlexCenterRow} from "../../assets/styles/styles.js"
-import {getAllFinancialEvents, getEventTypes} from "./services/AnalisisServices.js";
+import {getAllFinancialEvents, getEventTypes, getFinancialEventsByDate} from "./services/AnalisisServices.js";
+import dayjs from "dayjs";
+
+
+//TODO: usar selectores para el anual y mensual que empeizen por default en el mes y año actual
 
 export default function Analsis({scope}){
     const [eventRows, setEventRows] = useState([]);
     const [eventTypes, setEventTypes] = useState([]);
 
     useEffect(()=>{
-        getAllFinancialEvents().then((r) => {setEventRows(r)});
+        const handleFinancialEvent = {
+            'mensual':() => {
+                getFinancialEventsByDate(dayjs().month(),dayjs().year())
+                .then((r) => {
+                    console.log(r);
+                    setEventRows(r)
+                })
+                .catch((e)=> {
+                    console.log(e)
+                })},
+            'anual': () => {
+                getAllFinancialEvents()
+                .then((r) => {
+                    setEventRows(r)
+                })
+            },
+            'allTime': () => {
+                getAllFinancialEvents()
+                .then((r) => {setEventRows(r)
+                })
+            },
+        }
+        const financialEvent = handleFinancialEvent[scope];
+        if(financialEvent) {
+            console.log(financialEvent,scope)
+            financialEvent()
+        };
         getEventTypes().then((r) => {setEventTypes(r)});
-    },[])
+    },[scope])
 
 
     return (
