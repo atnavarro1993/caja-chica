@@ -14,8 +14,7 @@ export default function EventForm(){
     const {
         register,
         handleSubmit,
-        control,
-        formState: {errors}
+        control
     } = useForm();
 
     useEffect(() => {
@@ -34,7 +33,7 @@ export default function EventForm(){
                 setError(true);
             });
     }
-    //TODO: el custom toast se esta manejando mal internamente deberia haber una forma de retornarel toast? usando useState?
+
     return(
         <>
             <CustomToastMessage error={error} message={message} open={open}/>

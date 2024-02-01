@@ -1,7 +1,6 @@
 import {Alert, Snackbar} from "@mui/material";
 
-export default function CustomToastMessage({error,message,open = false}){
-
+function CustomToastMessage({error,message,open = false}){
     const handleToastClose = (event,reason) => {
         if (reason === 'clickaway') return false;
     }
@@ -14,3 +13,6 @@ export default function CustomToastMessage({error,message,open = false}){
         </Snackbar>
     )
 }
+
+
+export default CustomToastMessage;

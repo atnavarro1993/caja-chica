@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import {invoke} from "@tauri-apps/api/tauri";
 import {Box} from "@mui/material";
 import {GrillaEventos} from "./components/GrillaEventos.jsx";
 import {EventChart} from "./components/EventChart.jsx";
@@ -7,8 +6,6 @@ import {boxFlexCenterColumn, boxFlexCenterRow} from "../../assets/styles/styles.
 import {getAllFinancialEvents, getEventTypes, getFinancialEventsByDate} from "./services/AnalisisServices.js";
 import dayjs from "dayjs";
 
-
-//TODO: usar selectores para el anual y mensual que empeizen por default en el mes y año actual
 
 export default function Analsis({scope}){
     const [eventRows, setEventRows] = useState([]);
@@ -41,7 +38,7 @@ export default function Analsis({scope}){
         if(financialEvent) {
             console.log(financialEvent,scope)
             financialEvent()
-        };
+        }
         getEventTypes().then((r) => {setEventTypes(r)});
     },[scope])
 
