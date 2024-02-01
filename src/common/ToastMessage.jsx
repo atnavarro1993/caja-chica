@@ -1,11 +1,9 @@
-import {useEffect, useState} from "react";
 import {Alert, Snackbar} from "@mui/material";
 
 export default function CustomToastMessage({error,message,open = false}){
 
     const handleToastClose = (event,reason) => {
-        if (reason === 'clickaway') return;
-        open = false
+        if (reason === 'clickaway') return false;
     }
 
     return(
