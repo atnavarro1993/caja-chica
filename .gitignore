@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 *.db
 src-tauri/assets/**
+sonar-project.properties
+.scannerwork
